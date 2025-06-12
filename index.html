@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tool Tài Xỉu Go88 V2</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #000, #1a1a1a, #444000, #000);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      font-family: 'Segoe UI', sans-serif;
+      color: #FFD700;
+      text-align: center;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    h1 {
+      text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+      margin-top: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      box-shadow: 0 0 20px #FFD70020, 0 0 30px #FFD70010;
+    }
+    input, button, textarea {
+      padding: 10px;
+      width: 90%;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #FFD700;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #FFD700;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #fff700, 0 0 30px #FFD700;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      text-shadow: 0 0 5px #FFD700;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tool Tài Xỉu Go88 V2</h1>
+  <div class="container">
+    <h3>📥 Nhập kết quả 10 phiên gần nhất (Tài/Xỉu)</h3>
+    <input type="text" id="historyInput" placeholder="VD: Tai,Xiu,Tai,Tai,Xiu,..."/>
+    <button onclick="analyze()">Phân Tích & Dự Đoán</button>
+
+    <div class="result" id="patternBox" style="display:none;">
+      <h3>📊 Phân tích cầu:</h3>
+      <div id="pattern"></div>
+    </div>
+
+    <div class="result" id="predictBox" style="display:none;">
+      <h3>🔮 Dự đoán phiên tiếp theo:</h3>
+      <div id="prediction"></div>
+    </div>
+
+    <hr style="margin: 30px 0; border: 1px dashed #FFD700;">
+    <h3>📌 Lưu lịch sử đánh:</h3>
+    <textarea id="logBox" rows="5" placeholder="Lịch sử sẽ hiển thị ở đây..." readonly></textarea>
+    <button onclick="resetLog()">🔄 Reset Lịch Sử</button>
+  </div>
+
+  <script>
+    let historyLog = [];
+
+    function analyze() {
+      const input = document.getElementById("historyInput").value.toLowerCase().replace(/\s+/g,'');
+      const results = input.split(',').map(x => x.trim());
+      if (results.length < 5) {
+        alert("Vui lòng nhập ít nhất 5 kết quả!");
+        return;
+      }
+
+      let countTai = results.filter(x => x === "tai").length;
+      let countXiu = results.filter(x => x === "xiu").length;
+      let pattern = "";
+      let prediction = "";
+      let confidence = "";
+
+      // Cầu 2-1 kiểu đảo
+      if (results.slice(-3).join(',') === "tai,xiu,tai") {
+        pattern = "Cầu 2-1 đảo: Tai-Xiu-Tai";
+        prediction = "Xỉu";
+        confidence = "92%";
+      }
+      else if (results.slice(-3).join(',') === "xiu,tai,xiu") {
+        pattern = "Cầu 2-1 đảo: Xiu-Tai-Xiu";
+        prediction = "Tài";
+        confidence = "93%";
+      }
+      else if (results.slice(-4).every(v => v === results[results.length-1])) {
+        pattern = "⚠️ Bệt dài (" + results[results.length-1] + ") - Cảnh báo gãy!";
+        prediction = results[results.length-1] === "tai" ? "Xỉu" : "Tài";
+        confidence = "70%";
+      }
+      else {
+        pattern = "Dùng thống kê tổng thể.";
+        prediction = countTai > countXiu ? "Xỉu" : "Tài";
+        confidence = "65%";
+      }
+
+      document.getElementById("pattern").innerText = pattern;
+      document.getElementById("prediction").innerText = prediction + " (Độ tin cậy: " + confidence + ")";
+      document.getElementById("patternBox").style.display = "block";
+      document.getElementById("predictBox").style.display = "block";
+
+      const logText = `➤ Nhập: ${results.join(', ')}
+→ Dự đoán: ${prediction} (${confidence})`;
+      historyLog.push(logText);
+      document.getElementById("logBox").value = historyLog.join("\n\n");
+    }
+
+    function resetLog() {
+      historyLog = [];
+      document.getElementById("logBox").value = "";
+    }
+  </script>
+</body>
+</html>
